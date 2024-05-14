@@ -2,6 +2,11 @@ import { IInputs, IOutputs } from "./generated/ManifestTypes";
 
 export class fastLoad implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 
+    private _iframe: HTMLIFrameElement;
+    private _URL: string;
+    private _container: HTMLDivElement;
+    private _controlViewRendered: boolean;
+    private _refresh: HTMLButtonElement;
     /**
      * Empty constructor.
      */
@@ -20,17 +25,35 @@ export class fastLoad implements ComponentFramework.StandardControl<IInputs, IOu
      */
     public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void, state: ComponentFramework.Dictionary, container:HTMLDivElement): void
     {
+        console.log("init");
         // Add control initialization code
+        this._container = container;
+        this._controlViewRendered = false;
     }
 
-
+    private renderIframe(): void {
+        const iFrameElement: HTMLIFrameElement = document.createElement("iframe");
+        iFrameElement.setAttribute("class", "iFrameControl");
+        iFrameElement.setAttribute("frameborder", "0");
+        this._iframe = iFrameElement;
+        this._container.appendChild(this._iframe);
+    }
     /**
      * Called when any value in the property bag has changed. This includes field values, data-sets, global values such as container height and width, offline status, control metadata values such as label, visible, etc.
      * @param context The entire property bag available to control via Context Object; It contains values as set up by the customizer mapped to names defined in the manifest, as well as utility functions
      */
     public updateView(context: ComponentFramework.Context<IInputs>): void
     {
+        console.log("update view");
         // Add code to update control view
+        if(!this._controlViewRendered){
+            this.renderIframe();
+            this._controlViewRendered = true;
+        }
+        const iframeUrl = context.parameters.url.raw;
+        if(this._URL != iframeUrl){
+            this._URL = iframeUrl ? iframeUrl: "";
+        }
     }
 
     /**
@@ -39,6 +62,7 @@ export class fastLoad implements ComponentFramework.StandardControl<IInputs, IOu
      */
     public getOutputs(): IOutputs
     {
+        console.log("output");
         return {};
     }
 
